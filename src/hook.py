@@ -39,14 +39,25 @@ class WebHookServer(object):
                         if m != None:
                             response = self.handle_message(m["sender"]["id"], m["message"]["text"], m["timestamp"])
                             if response != "" and response != None:
-                                requests.post("https://graph.facebook.com/v2.6/me/messages?access_token=%s" % self.page_access_token, json={
-                                    "recipient": {
-                                        "id": m["sender"]["id"]
-                                    }, 
-                                    "message": {
-                                        "text": response 
-                                    }
-                                })
+                                if type(response) == list:
+                                    for r in response:
+                                        requests.post("https://graph.facebook.com/v2.6/me/messages?access_token=%s" % self.page_access_token, json={
+                                            "recipient": {
+                                                "id": m["sender"]["id"]
+                                            }, 
+                                            "message": {
+                                                "text": r 
+                                            }
+                                        })
+                                else:
+                                    requests.post("https://graph.facebook.com/v2.6/me/messages?access_token=%s" % self.page_access_token, json={
+                                        "recipient": {
+                                            "id": m["sender"]["id"]
+                                        }, 
+                                        "message": {
+                                            "text": response 
+                                        }
+                                    })
                 return ""
 
     def serve(self):
